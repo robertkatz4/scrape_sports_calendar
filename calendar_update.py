@@ -1,4 +1,3 @@
-
 from __future__ import print_function
 import httplib2
 import os
@@ -52,7 +51,7 @@ def get_credentials():
         print('Storing credentials to ' + credential_path)
     return credentials
 
-def main():
+def update():
     """Shows basic usage of the Google Calendar API.
 
     Creates a Google Calendar API service object and outputs a list of the next
@@ -84,6 +83,6 @@ def delete():
     event = service.events().delete(calendarId='primary', eventId='lfd68q0uitfmsg8lkfds3qdvc0').execute()
 
 
-if __name__ == '__main__':
+def __main__():
 #    main()
     delete()
