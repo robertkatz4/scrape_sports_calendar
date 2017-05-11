@@ -2,6 +2,8 @@ import scrapy
 import datetime as dt
 from scrapy.crawler import CrawlerProcess
 
+
+
 class ScheduleSpider(scrapy.Spider):
     name = "premier_league"
     start_urls = [
@@ -23,7 +25,7 @@ class ScheduleSpider(scrapy.Spider):
             dt_var = dt.date(2017,month_int,day_int)
             dt_var = dt_var.strftime('%m/%d/%Y')
             watch_fc  = ["[u'Chelsea']","[u'Spurs']","[u'Liverpool']","[u'Man City']","[u'Arsenal']","[u'Man Utd']"]
-            if home in watch_fc and away in watch_fc:
+            if home in watch_fc or away in watch_fc:
                 yield {
                     'subject': heading,
                     'dt_var': dt_var,
@@ -32,9 +34,9 @@ class ScheduleSpider(scrapy.Spider):
                     'away': away,
                 }
 
-if __name__ == "__main__":
+def __main__():
         process = CrawlerProcess({
         'USER_AGENT': 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)'
     })
-    process.crawl(ScheduleSpider)
-    process.start()
+        process.crawl(ScheduleSpider)
+        process.start()
