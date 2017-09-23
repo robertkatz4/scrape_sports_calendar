@@ -1,6 +1,8 @@
 Scrape of the NBA's national television with only the channels I care about
-  as of March 1 the site changed and the scraper no longer works ¯\_(ツ)_/¯
+  as of March 1 2017 the site changed and the scraper no longer works ¯\_(ツ)_/¯
 
+For 2017-2018 I added a new scraper that hits the NBA's site - really just hits the JSON API.
+----
 Scrape of the Premier League's national television with only the teams I care about - the top 6. The idea is to return a JSON file from the Scrapy scraper
 can be run with
 python scrape_sports_api/spiders/spider_premier_league.py
