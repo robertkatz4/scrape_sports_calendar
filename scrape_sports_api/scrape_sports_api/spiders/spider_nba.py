@@ -13,7 +13,7 @@
 #another change
 
 import scrapy
-from datetime import strptime
+from datetime import datetime
 
 class ScheduleSpider(scrapy.Spider):
     name = "nba"
