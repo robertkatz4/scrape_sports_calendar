@@ -9,10 +9,10 @@
 #     http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
 #     http://scrapy.readthedocs.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = 'scrape_sports_api'
+BOT_NAME = 'scrapy_py_module'
 
-SPIDER_MODULES = ['scrape_sports_api.spiders']
-NEWSPIDER_MODULE = 'scrape_sports_api.spiders'
+SPIDER_MODULES = ['scrapy_py_module.spiders']
+NEWSPIDER_MODULE = 'scrapy_py_module.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
