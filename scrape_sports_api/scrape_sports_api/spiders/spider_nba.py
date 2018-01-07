@@ -18,7 +18,7 @@ from datetime import *
 class ScheduleSpider(scrapy.Spider):
     name = "nba"
     start_urls = [
-        'http://www.nba.com/schedules/national_tv_schedule/',
+        'http://stats.nba.com/schedule/#!/?rfr=nba',
     ]
 
     def parse(self, response):
