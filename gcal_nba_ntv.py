@@ -23,13 +23,13 @@ APPLICATION_NAME = 'Google Calendar API Python Quickstart'
 
 
 def get_credentials():
-    """Gets valid user credentials from storage.
+    """Gets valid user credentials from storage. Creates a Google Calendar API service object
 
     If nothing has been stored, or if the stored credentials are invalid,
     the OAuth2 flow is completed to obtain the new credentials.
 
     Returns:
-        Credentials, the obtained credential.
+        Credentials, the obtained credential, and gcal service object
     """
     home_dir = os.path.expanduser('~')
     credential_dir = os.path.join(home_dir, '.credentials')
@@ -48,24 +48,121 @@ def get_credentials():
         else:  # Needed only for compatibility with Python 2.6
             credentials = tools.run(flow, store)
         print('Storing credentials to ' + credential_path)
-    return credentials
+    http = credentials.authorize(httplib2.Http())
+    service = discovery.build('calendar', 'v3', http=http)
+    return service
 
 
-def list_knicks_calendar_events():
+def get_calendar_events(service, gcal_id):
+    """Pulls list of events on a calendar
+
+    Returns json of all event attributes
+    """
+
+    now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
+    print('Getting the upcoming 10 events')
+    eventsResult = service.events().list(
+        calendarId=gcal_id,
+        timeMin=now, maxResults=100, singleEvents=True,
+        orderBy='startTime').execute()
+    matches = eventsResult.get('items', [])
+    if not matches:
+        print('No upcoming events found.')
+    return matches
+
+def get_events_schedule(filter, service, gcal_id, json):
+    """Parses event list to pull iCalUID for each schedule
+    """
+
+    now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
+    this_schedule = [x['id'] for x in json if x['summary'][0:6] == filter]
+    return this_schedule
+    # for match in json:
+    #     start = match['start'].get('dateTime', match['start'].get('date'))
+    #     output = match['summary'], match['iCalUID']
+    #     matches_parsed.append(output)
+    # return matches_parsed
+
+
+def list_calendars(service, verbose=True):
     """Shows basic usage of the Google Calendar API.
 
     Creates a Google Calendar API service object and outputs a list of the next
     10 events on the user's calendar.
     """
-    credentials = get_credentials()
-    http = credentials.authorize(httplib2.Http())
-    service = discovery.build('calendar', 'v3', http=http)
+    now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
+    page_token = None
+    while True:
+        calendar_list = service.calendarList().list(pageToken=page_token).execute()
+        if verbose==True:
+            for calendar_list_entry in calendar_list['items']:
+                print (calendar_list_entry['summary'])
+                print (calendar_list_entry['id'])
+        page_token = calendar_list.get('nextPageToken')
+        if not page_token:
+            break
+
+def sports_insert_matches(service, gcal_id):
+    """
+    Takes a Google Calendar API service object, and a list of dict objects,
+    inserts into gCal
+    """
+    meetings = [{
+      'summary': 'Google I/O 2015',
+      'location': '800 Howard St., San Francisco, CA 94103',
+      'description': 'A chance to hear more about Google\'s developer products.',
+      'start': {
+        'dateTime': '2018-01-28T09:00:00-07:00',
+        'timeZone': 'America/Los_Angeles',
+      },
+      'end': {
+        'dateTime': '2018-01-28T17:00:00-07:00',
+        'timeZone': 'America/Los_Angeles',
+      },
+      'recurrence': [
+        'RRULE:FREQ=DAILY;COUNT=2'
+      ],
+      'attendees': [
+        {'email': 'lpage@example.com'},
+        {'email': 'sbrin@example.com'},
+      ],
+      'reminders': {
+        'useDefault': False,
+        'overrides': [
+          {'method': 'email', 'minutes': 24 * 60},
+          {'method': 'popup', 'minutes': 10},
+        ],
+      },
+    } ,
+    {
+      'summary': 'Google I/O 2015',
+      'location': '800 Howard St., San Francisco, CA 94103',
+      'description': 'A chance to hear more about Google\'s developer products.',
+      'start': {
+        'dateTime': '2018-01-29T09:00:00-07:00',
+        'timeZone': 'America/Los_Angeles',
+      },
+      'end': {
+        'dateTime': '2018-01-29T17:00:00-07:00',
+        'timeZone': 'America/Los_Angeles',
+      },
+      'reminders': {
+        'useDefault': False,
+        'overrides': [
+          {'method': 'email', 'minutes': 24 * 60},
+          {'method': 'popup', 'minutes': 10},
+        ],
+      },
+    }
+    ]
+    print('Inserting event into Sports')
+    for meeting in meetings:
+        event = service.events().insert(calendarId=gcal_id, body=meeting).execute()
 
     now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
-    print('Getting the upcoming 10 events')
     eventsResult = service.events().list(
-        calendarId='v13oq67ipd8ak5k271u3308hc8@group.calendar.google.com',
-        timeMin=now, maxResults=10, singleEvents=True,
+        calendarId=gcal_id,
+        timeMin=now, maxResults=100, singleEvents=True,
         orderBy='startTime').execute()
     events = eventsResult.get('items', [])
 
@@ -73,31 +170,27 @@ def list_knicks_calendar_events():
         print('No upcoming events found.')
     for event in events:
         start = event['start'].get('dateTime', event['start'].get('date'))
-        print(start, event['summary'])
 
 
-def list_calendars():
-    """Shows basic usage of the Google Calendar API.
-
-    Creates a Google Calendar API service object and outputs a list of the next
-    10 events on the user's calendar.
+def sports_delete_events(service, icalendar, del_event_ids):
     """
-    credentials = get_credentials()
-    http = credentials.authorize(httplib2.Http())
-    service = discovery.build('calendar', 'v3', http=http)
-
-    now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
-    page_token = None
-    while True:
-        calendar_list = service.calendarList().list(pageToken=page_token).execute()
-        for calendar_list_entry in calendar_list['items']:
-            print (calendar_list_entry['summary'])
-            print (calendar_list_entry['id'])
-        page_token = calendar_list.get('nextPageToken')
-        if not page_token:
-            break
+    Takes list of iCalUIDS and deletes them from the given calendar.
+    """
+    print('deleting events')
+    for i in del_event_ids:
+        print('event_id for del', i)
+        print('ical_id for del', icalendar)
+        service.events().delete(calendarId=icalendar, eventId=i).execute()
 
 
 if __name__ == '__main__':
-    list_calendars()
-    list_knicks_calendar_events()
+    service = get_credentials()
+    sports_cal_id = 'vkuae4kj45qoo09m53l9sua280@group.calendar.google.com'
+    list_calendars(service)
+    # sports_insert_matches(service, gcal_id=sports_cal_id)
+    calendar_events = get_calendar_events(service, sports_cal_id)
+    this_schedule_iCalUIDs = get_events_schedule('Google', service, sports_cal_id, calendar_events)
+    print('all ids', this_schedule_iCalUIDs)
+    sports_delete_events(service,
+                         icalendar=sports_cal_id,
+                         del_event_ids=this_schedule_iCalUIDs)
