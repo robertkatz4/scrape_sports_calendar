@@ -1,2 +1,5 @@
 # copies of Python files
 *.pyc
+
+# output
+*.csv
