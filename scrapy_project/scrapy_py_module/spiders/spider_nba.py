@@ -13,12 +13,12 @@
 #another change
 
 import scrapy
-from datetime import *
+from datetime import datetime
 
 class ScheduleSpider(scrapy.Spider):
     name = "nba"
     start_urls = [
-        'http://www.nba.com/schedules/national_tv_schedule/',
+        'http://stats.nba.com/schedule/#!/?rfr=nba',
     ]
 
     def parse(self, response):
@@ -57,7 +57,7 @@ class ScheduleSpider(scrapy.Spider):
             channel=s[s.find("_")+1:s.find(".",s.find("_"))]
             #time
             time_str = game.css('td.tm::text').extract()[0]
-            time_var = datetime.strptime(time_str,'%I:%M %p')
+            time_var = strptime(time_str,'%I:%M %p')
             time_var_end = time_var + timedelta(minutes=150)
             if time_var_end.hour == 12 or time_var_end.hour == 1 or time_var_end.hour == 2:
                 time_str_end = "11:59 pm"
