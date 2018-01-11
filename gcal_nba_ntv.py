@@ -55,7 +55,6 @@ def get_credentials():
 
 def get_calendar_events(service, gcal_id):
     """Pulls list of events on a calendar
-
     Returns json of all event attributes
     """
 
@@ -70,13 +69,17 @@ def get_calendar_events(service, gcal_id):
         print('No upcoming events found.')
     return matches
 
-def get_events_schedule(filter, service, gcal_id, json):
-    """Parses event list to pull iCalUID for each schedule
+def filter_events_schedule(service, json_list, verbose=True):
+    """Parses list of events to pull event id for each schedule based on a
+    filter in a list comprehension
     """
 
     now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
-    this_schedule = [x['id'] for x in json if x['summary'][0:6] == filter]
-    return this_schedule
+    json_list_info = [x['id'] for x in json_list if ' @ ' in x['summary']]
+    if verbose is True:
+        json_list_summaries = [x['summary'] for x in json_list if ' @ ' in x['summary']]
+        print(json_list_summaries)
+    return json_list_info
     # for match in json:
     #     start = match['start'].get('dateTime', match['start'].get('date'))
     #     output = match['summary'], match['iCalUID']
@@ -174,12 +177,12 @@ def sports_insert_matches(service, gcal_id):
 
 def sports_delete_events(service, icalendar, del_event_ids):
     """
-    Takes list of iCalUIDS and deletes them from the given calendar.
+    Takes list of event ids and deletes them from the given calendar.
     """
     print('deleting events')
     for i in del_event_ids:
         print('event_id for del', i)
-        print('ical_id for del', icalendar)
+        print('calendar for del', icalendar)
         service.events().delete(calendarId=icalendar, eventId=i).execute()
 
 
@@ -189,7 +192,7 @@ if __name__ == '__main__':
     list_calendars(service)
     # sports_insert_matches(service, gcal_id=sports_cal_id)
     calendar_events = get_calendar_events(service, sports_cal_id)
-    this_schedule_iCalUIDs = get_events_schedule('Google', service, sports_cal_id, calendar_events)
+    this_schedule_iCalUIDs = filter_events_schedule('Google', service, sports_cal_id, calendar_events)
     print('all ids', this_schedule_iCalUIDs)
     sports_delete_events(service,
                          icalendar=sports_cal_id,
