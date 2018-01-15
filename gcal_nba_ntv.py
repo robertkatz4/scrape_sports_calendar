@@ -122,19 +122,15 @@ def sports_delete_events(icalendar, schedule, verbose=True):
     icalendar_json_list = get_calendar_events(service, icalendar)
     if schedule == 'NBA':
         list_ids = [x['id'] for x in icalendar_json_list
-                    if x['summary'][0:3] == 'NBA']
+                    if x['description'] == 'NBA National TV schedule']
     else:
         exit('No schedule specified')
     if verbose is True:
-        json_list_summaries = [x['summary'] for x in icalendar_json_list
-                               if x['summary'][0:3] == 'NBA']
-        print(json_list_summaries)
+        list_summaries = [x['summary'] for x in icalendar_json_list
+                          if x['description'] == 'NBA National TV schedule']
+        print(list_summaries)
     print('deleting events')
     for i in list_ids:
         print('event_id for del', i)
         print('calendar for del', icalendar)
         service.events().delete(calendarId=icalendar, eventId=i).execute()
-
-
-if __name__ == '__main__':
-    sports_cal_id = 'vkuae4kj45qoo09m53l9sua280@group.calendar.google.com'

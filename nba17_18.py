@@ -10,7 +10,7 @@ from urllib2 import urlopen
 from datetime import datetime, timedelta
 
 
-def nba_ntl_17_18():
+def nba_ntl_17_18(schedule = 'NBA'):
     url = 'https://data.nba.com/data/10s/v2015/json/mobile_teams/nba/2017/league/'
     file = '00_full_schedule_week.json'
     url_complete = url + file
@@ -39,4 +39,4 @@ def nba_ntl_17_18():
                     output['end']['dateTime'] = '{:%Y-%m-%dT%H:%M:%S}'.format(e_time)
                     output['end']['timeZone'] = timezone
                     output_list.append(output)
-                    return output_list
+    return schedule, output_list
