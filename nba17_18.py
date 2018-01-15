@@ -10,7 +10,7 @@ from urllib2 import urlopen
 from datetime import datetime, timedelta
 
 
-def nba_ntl_17_18(schedule = 'NBA'):
+def nba_ntl_17_18():
     url = 'https://data.nba.com/data/10s/v2015/json/mobile_teams/nba/2017/league/'
     file = '00_full_schedule_week.json'
     url_complete = url + file
@@ -22,7 +22,8 @@ def nba_ntl_17_18(schedule = 'NBA'):
             tv = j['bd']['b']
             for c in tv:
                 s_time = datetime.strptime(j['etm'], '%Y-%m-%dT%H:%M:%S')
-                if c['scope'] == 'natl' and s_time > datetime(2017, 10, 16):
+                if c['scope'] == 'natl' and c['type'] == 'tv' \
+                        and s_time > datetime(2017, 10, 16):
                     subject = j['v']['tc'] + ' ' + '@' + ' ' + j['h']['tc']
                     e_time = s_time + timedelta(hours=2, minutes=30)
                     if e_time.hour < 10:
@@ -39,4 +40,4 @@ def nba_ntl_17_18(schedule = 'NBA'):
                     output['end']['dateTime'] = '{:%Y-%m-%dT%H:%M:%S}'.format(e_time)
                     output['end']['timeZone'] = timezone
                     output_list.append(output)
-    return schedule, output_list
+    return output_list

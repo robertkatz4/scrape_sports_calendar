@@ -8,13 +8,14 @@ from oauth2client import client
 from oauth2client import tools
 from oauth2client.file import Storage
 
-import datetime
+from datetime import datetime
 
 try:
     import argparse
     flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
 except ImportError:
     flags = None
+
 
 # If modifying these scopes, delete your previously saved credentials
 # at ~/.credentials/calendar-python-quickstart.json
@@ -72,21 +73,45 @@ def list_calendars(service, verbose=True):
             break
 
 
-def get_calendar_events(service, gcal_id):
+def get_calendar_events(service, gcal_id, dates):
     """Pulls list of events on a calendar
     Returns json of all event attributes
     """
-
-    now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
-    print('Getting the upcoming 100 events')
     eventsResult = service.events().list(
         calendarId=gcal_id,
-        timeMin=now, maxResults=100, singleEvents=True,
+        timeMin=dates['begin'], maxResults=600, singleEvents=True,
         orderBy='startTime').execute()
     matches = eventsResult.get('items', [])
     if not matches:
         print('No upcoming events found.')
     return matches
+
+
+def sports_delete_events(icalendar, schedule_name, schedule_dict, verbose=True):
+    """
+    Takes calendar, NEEDS BESPOKE FILTER IN filter_events_schedule to find
+    event IDs to be deleted, and deletes those ids
+    from the given calendar.
+    """
+
+    service = get_credentials()
+    print('Retriving matches from the '
+          + schedule_name + ' schedule')
+    icalendar_json_list = get_calendar_events(service, icalendar, schedule_dict)
+    if schedule_name == 'nba':
+        list_matches = tuple((x['id'], x['summary'])
+                             for x in icalendar_json_list
+                             if x['description'] == 'NBA National TV schedule')
+    else:
+        exit('No schedule specified')
+    print('Retrived ' + str(len(list_matches)) + ' matches ' +
+          'from the ' + schedule_name + ' schedule, deleting...')
+    for i, s in list_matches:
+        if verbose is True:
+            print(s)
+        service.events().delete(calendarId=icalendar, eventId=i).execute()
+    print('Deleted ' + str(len(list_matches)) + ' events from the ' +
+          schedule_name + ' schedule with the appropriate filter')
 
 
 def sports_insert_matches(gcal_id, schedule):
@@ -95,42 +120,6 @@ def sports_insert_matches(gcal_id, schedule):
     inserts into gCal
     """
     service = get_credentials()
-    print('Inserting event into Sports')
     for m in schedule:
         event = service.events().insert(calendarId=gcal_id, body=m).execute()
-
-    now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
-    eventsResult = service.events().list(
-        calendarId=gcal_id,
-        timeMin=now, maxResults=100, singleEvents=True,
-        orderBy='startTime').execute()
-    events = eventsResult.get('items', [])
-
-    if not events:
-        print('No upcoming events found.')
-    # for event in events:
-    #     start = event['start'].get('dateTime', event['start'].get('date'))
-
-
-def sports_delete_events(icalendar, schedule, verbose=True):
-    """
-    Takes calendar, NEEDS BESPOKE FILTER IN filter_events_schedule to find
-    event IDs to be deleted, and deletes those ids
-    from the given calendar.
-    """
-    service = get_credentials()
-    icalendar_json_list = get_calendar_events(service, icalendar)
-    if schedule == 'NBA':
-        list_ids = [x['id'] for x in icalendar_json_list
-                    if x['description'] == 'NBA National TV schedule']
-    else:
-        exit('No schedule specified')
-    if verbose is True:
-        list_summaries = [x['summary'] for x in icalendar_json_list
-                          if x['description'] == 'NBA National TV schedule']
-        print(list_summaries)
-    print('deleting events')
-    for i in list_ids:
-        print('event_id for del', i)
-        print('calendar for del', icalendar)
-        service.events().delete(calendarId=icalendar, eventId=i).execute()
+        print(m['summary'], m['start']['dateTime'])
