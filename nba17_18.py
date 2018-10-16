@@ -23,6 +23,7 @@ def nba_ntl_17_18():
             for c in tv:
                 s_time = datetime.strptime(j['etm'], '%Y-%m-%dT%H:%M:%S')
                 if c['scope'] == 'natl' and c['type'] == 'tv' \
+                        and c['disp'] != 'NBA TV' \
                         and s_time > datetime(2017, 10, 16):
                     subject = j['v']['tc'] + ' ' + '@' + ' ' + j['h']['tc']
                     e_time = s_time + timedelta(hours=2, minutes=30)
@@ -55,7 +56,8 @@ def knicks_17_18():
             tv = j['bd']['b']
             for c in tv:
                 s_time = datetime.strptime(j['etm'], '%Y-%m-%dT%H:%M:%S')
-                if c['scope'] == 'home' and c['type'] == 'tv' \
+                if (c['scope'] == 'home' and c['type'] == 'tv' or \
+                    c['scope'] == 'away' and c['type'] == 'tv') \
                         and s_time > datetime(2017, 10, 16) \
                         and 'NYK' in j['gcode']:
                     subject = j['v']['tc'] + ' ' + '@' + ' ' + j['h']['tc']
