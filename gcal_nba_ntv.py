@@ -101,7 +101,8 @@ def sports_delete_events(icalendar, schedule_name, schedule_dict, verbose=True):
     if schedule_name == 'nba':
         list_matches = tuple((x['id'], x['summary'])
                              for x in icalendar_json_list
-                             if x['description'] == 'NBA National TV schedule')
+                            # if x['description'] == 'NBA National TV schedule'
+                             )
     elif schedule_name == 'nyk':
         list_matches = tuple((x['id'], x['summary'])
                              for x in icalendar_json_list
