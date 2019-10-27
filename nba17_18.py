@@ -6,7 +6,6 @@
 # Google Calendar.
 
 import json
-from urllib2 import urlopen
 from datetime import datetime, timedelta
 
 
@@ -14,7 +13,7 @@ def nba_ntl_17_18():
     url = 'https://data.nba.com/data/10s/v2015/json/mobile_teams/nba/2017/league/'
     file = '00_full_schedule_week.json'
     url_complete = url + file
-    response = urlopen(url_complete)
+    response = urllib.request.urlopen(url_complete)
     r = json.load(response)
     output_list = []
     for i in r['lscd']:
@@ -48,7 +47,7 @@ def knicks_17_18():
     url = 'https://data.nba.com/data/10s/v2015/json/mobile_teams/nba/2017/league/'
     file = '00_full_schedule_week.json'
     url_complete = url + file
-    response = urlopen(url_complete)
+    response = urllib.request.urlopen(url_complete)
     r = json.load(response)
     output_list = []
     for i in r['lscd']:
