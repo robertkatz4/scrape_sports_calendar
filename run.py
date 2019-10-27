@@ -11,7 +11,7 @@ def scrape_site():
     schedule_begin_end = {}
     schedule_begin_end['nba'] = {}
     schedule_begin_end['nba']['begin'] = \
-            datetime(2019, 10, 16, 12).isoformat() + 'Z'
+            datetime(2017, 10, 16, 12).isoformat() + 'Z'
     schedule_begin_end['nba']['end'] = \
             datetime(2020, 4, 12, 12).isoformat() + 'Z'
     schedule_begin_end['nba']['matches'] = nba_ntl_tv()

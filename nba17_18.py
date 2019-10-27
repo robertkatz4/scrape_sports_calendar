@@ -26,6 +26,8 @@ def nba_ntl_tv():
                         and c['disp'] != 'NBA TV' \
                         and s_time > datetime(2017, 10, 16):
                     subject = j['v']['tc'] + ' ' + '@' + ' ' + j['h']['tc']
+                    subject = subject.replace("LA","Clippers")
+                    subject = subject.replace("Los Angeles","Lakers")
                     e_time = s_time + timedelta(hours=2, minutes=30)
                     if e_time.hour < 10:
                         e_time = s_time.replace(hour=23, minute=59)
