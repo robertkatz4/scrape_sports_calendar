@@ -2,6 +2,7 @@ from __future__ import print_function
 import httplib2
 import os
 from sys import exit
+from retry import retry
 
 from apiclient import discovery
 from oauth2client import client
@@ -19,7 +20,7 @@ except ImportError:
 
 # If modifying these scopes, delete your previously saved credentials
 # at ~/.credentials/calendar-python-quickstart.json
-SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
+SCOPES = 'https://www.googleapis.com/auth/calendar.events'
 CLIENT_SECRET_FILE = 'client_secret.json'
 APPLICATION_NAME = 'Google Calendar API Python Quickstart'
 
@@ -127,5 +128,10 @@ def sports_insert_matches(gcal_id, schedule):
     """
     service = get_credentials()
     for m in schedule:
-        event = service.events().insert(calendarId=gcal_id, body=m).execute()
-        print(m['summary'], m['start']['dateTime'])
+        insert_match(m, gcal_id, service)
+
+
+@retry(delay=20)
+def insert_match(game, gcal_id, service):
+    event = service.events().insert(calendarId=gcal_id, body=game).execute()
+    print (game['summary'], game['start']['dateTime'])
