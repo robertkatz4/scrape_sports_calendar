@@ -1,5 +1,5 @@
 from __future__ import print_function
-import http.client
+import httplib2
 import os
 from sys import exit
 
@@ -38,7 +38,7 @@ def get_credentials():
     if not os.path.exists(credential_dir):
         os.makedirs(credential_dir)
     credential_path = os.path.join(credential_dir,
-                                   'calendar-python-quickstart.json')
+                                   'client_secrets.json')
 
     store = Storage(credential_path)
     credentials = store.get()
@@ -50,7 +50,8 @@ def get_credentials():
         else:  # Needed only for compatibility with Python 2.6
             credentials = tools.run(flow, store)
         print('Storing credentials to ' + credential_path)
-    http = credentials.authorize(http.client.Http())
+    http = credentials.authorize(httplib2.Http())
+
     service = discovery.build('calendar', 'v3', http=http)
     return service
 
