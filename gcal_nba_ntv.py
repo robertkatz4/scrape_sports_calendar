@@ -1,5 +1,5 @@
 from __future__ import print_function
-import httplib2
+import http.client
 import os
 from sys import exit
 
@@ -50,7 +50,7 @@ def get_credentials():
         else:  # Needed only for compatibility with Python 2.6
             credentials = tools.run(flow, store)
         print('Storing credentials to ' + credential_path)
-    http = credentials.authorize(httplib2.Http())
+    http = credentials.authorize(http.client.Http())
     service = discovery.build('calendar', 'v3', http=http)
     return service
 

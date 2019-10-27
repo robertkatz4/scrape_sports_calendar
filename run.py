@@ -2,31 +2,29 @@ from datetime import datetime
 
 import gin
 
-from nba17_18 import nba_ntl_17_18
-from nba17_18 import knicks_17_18
+from nba17_18 import nba_ntl_tv
 from gcal_nba_ntv import sports_insert_matches
 from gcal_nba_ntv import sports_delete_events
 
-schedule_begin_end = {}
-schedule_begin_end['nba'] = {}
-schedule_begin_end['nba']['begin'] = \
-        datetime(2017, 10, 16, 12, 00, 00).isoformat() + 'Z'
-schedule_begin_end['nba']['end'] = \
-        datetime(2018, 04, 12, 12, 00, 00).isoformat() + 'Z'
-schedule_begin_end['nba']['matches'] = nba_ntl_17_18()
-# schedule_begin_end['nyk'] = {}
-# schedule_begin_end['nyk']['begin'] = \
-#         datetime(2017, 10, 16, 12, 00, 00).isoformat() + 'Z'
-# schedule_begin_end['nyk']['end'] = \
-#         datetime(2018, 04, 12, 12, 00, 00).isoformat() + 'Z'
-# schedule_begin_end['nyk']['matches'] = knicks_17_18()
+
+def scrape_site():
+    schedule_begin_end = {}
+    schedule_begin_end['nba'] = {}
+    schedule_begin_end['nba']['begin'] = \
+            datetime(2019, 10, 16, 12).isoformat() + 'Z'
+    schedule_begin_end['nba']['end'] = \
+            datetime(2020, 4, 12, 12).isoformat() + 'Z'
+    schedule_begin_end['nba']['matches'] = nba_ntl_tv()
+    return schedule_begin_end
+
 
 @gin.configurable
 def main(cal=None):
+    package = scrape_site()
     cal=cal
     cal_list = [cal]
     for i in cal_list:
-        for schedule_name, schedule_values in schedule_begin_end.iteritems():
+        for schedule_name, schedule_values in package.items():
             sports_delete_events(i,
                                  schedule_name,
                                  schedule_values)
